@@ -69,3 +69,12 @@ jobs:
           run: echo "${{ needs.build.outputs.scripts-file }}"   
         - name: Deploy
           run: echo "Deploying the artifact"
+  report:
+    needs: deploy
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+        - name: Output Information
+          run: |
+            echo "Something went wrong"
+            echo "${{ github }}"
