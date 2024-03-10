@@ -1,0 +1,13 @@
+name: Matrix Jobs to Print Names
+on: workflow_dispatch
+jobs:
+    printing-names:
+        strategy:
+            matrix:
+                names: [RAM, KRISHNA, SHIVA, VISHNU]
+                initials: [A, B, C]
+        runs-on: ubuntu-latest
+        steps:
+            - name: printing names with initials
+              run: echo "${{ matrix.names }}, ${{ matrix.initials }}"
+
