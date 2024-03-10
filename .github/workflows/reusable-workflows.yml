@@ -1,0 +1,8 @@
+name: Reusable Workflows
+on: [push, workflow_call]
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Output Informaiton
+              run: echo "Deploying & Uploading"
