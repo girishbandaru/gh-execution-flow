@@ -57,7 +57,7 @@ jobs:
                 
   deploy:
     needs: build
-    uses: ../.github/workflows/reusable-workflows.yml
+    uses: ./reusable-workflows.yml
   report:
     needs: deploy
     if: success()
