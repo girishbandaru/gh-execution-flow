@@ -59,7 +59,13 @@ jobs:
     needs: build
     uses: ./.github/workflows/reusable-workflows.yml
     with:
-      artifact-name: dist-files
+      artifact-name: dist-files-react
+  print-deploy-job:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: print deploy putput
+        run: echo "${{ needs.deploy.outputs.result }}"
   report:
     needs: deploy
     if: success()

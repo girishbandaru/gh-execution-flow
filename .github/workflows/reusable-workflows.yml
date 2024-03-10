@@ -7,9 +7,15 @@ on:
                 required: false
                 default: dist #default value if the value is not passed from the calling workflow
                 type: string
+        outputs:
+            result:
+                description: the result of deployment operation
+                value: ${{ jobs.deploy.outputs.outcome }} 
 jobs:
     deploy:
-        runs-on: ubuntu-latest
+        outputs:
+            outcome: ${{ steps.set-result.outputs.step-result }}
+        runs-on: ubuntu-latest  
         steps:
             - name: Download artifact
               uses: actions/download-artifact@v4.1.4
@@ -19,3 +25,6 @@ jobs:
               run: ls -ltr
             - name: Output Informaiton
               run: echo "Deploying & Uploading"
+            - name: set result output
+              id: set-result
+              run: echo "step-result=success" >> $GITHUB_OUTPUT
