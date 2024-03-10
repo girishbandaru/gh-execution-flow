@@ -1,0 +1,70 @@
+name: Using for Reusable Workflows
+on: [push, workflow_dispatch]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+        - name: checkout code
+          uses: actions/checkout@v4.1.1
+        - name: Caching dependencies
+          id: cache
+          uses: actions/cache@v4.0.1
+          with:
+            path: ~/.npm
+            key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}  
+        - name: install NodeJS
+          uses: actions/setup-node@v4.0.2
+          with:
+           node-version: 18
+        - name: install dependencies
+          run: npm ci
+        - name: Run tests
+          id: run-tests
+          run: npm test          
+        - name: Upload Test Report
+          if: success() && steps.run-tests.outcome == 'successful'
+          uses: actions/upload-artifact@v4.3.1
+          with:
+            name: test-report
+            path: test.json    
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    outputs:
+        scripts-file: ${{ steps.publish.outputs.script-file }}
+    steps:
+        - name: checkout code
+          uses: actions/checkout@v4.1.1
+        - name: Caching dependencies
+          uses: actions/cache@v4.0.1
+          with:
+            path: ~/.npm
+            key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+        - name: install dependencies
+          run: npm ci        
+        - name: Build Project
+          run: npm run build
+        - name: publish JS filename
+          id: publish
+          run: find dist/assets/*.js -type f -execdir echo 'script-file={}' >> $GITHUB_OUTPUT ';'  
+        - name: upload artifacts
+          uses: actions/upload-artifact@v4.3.1
+          with:
+            name: dist-files-react
+            path: dist
+                # dist
+                # package.json
+                
+  deploy:
+    needs: build
+    uses: ./.github/workflows/reusable-workflows.yml
+
+  report:
+    needs: deploy
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+        - name: Output Information
+          run: |
+            echo "Something went wrong"
+            echo "${{ toJSON(github) }}"
